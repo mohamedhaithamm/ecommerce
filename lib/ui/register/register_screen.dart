@@ -1,6 +1,6 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:e_commerce/dialog_utils.dart';
+import 'package:e_commerce/domain/useCase/register_use_case.dart';
+import 'package:e_commerce/ui/register/cubit/Register_state.dart';
 import 'package:e_commerce/ui/register/cubit/Register_view_model.dart';
 import 'package:e_commerce/ui/register/register_screen_navigator.dart';
 import 'package:flutter/material.dart';
@@ -20,24 +20,27 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen>
     implements RegisterScreenNavigator {
 
-RegisterViewModel viewModel = RegisterViewModel();
-
-  // RegisterScreenViewModel viewModel = RegisterScreenViewModel(injectAuthRepository());
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   viewModel.navigator = this;
-  // }
+RegisterViewModel viewModel = RegisterViewModel(injectRegisterUseCase());
 
   @override
   Widget build(BuildContext context) {
     return 
-      // ChangeNotifierProvider<RegisterScreenViewModel>(
-      // create: (context) => viewModel,
-      // child: 
+
       BlocListener(
         listener: ((context,state){
+          if(state is RegisterLoadingState){
+            DialogUtils.showProgressDialog(context, state.loadingMessage!);
+          }else if(state is RegisterErrorState){
+            DialogUtils.hideDialog(context);
+            DialogUtils.showMessage(context, state.errorMessage!,
+            posActionTitle: 'ok'
+            );
+          }else if(state is RegisterSuccessState){
+            DialogUtils.hideDialog(context);
+            DialogUtils.showMessage(context, 'Register Successfully',
+                posActionTitle: 'ok'
+            );
+          }
 
         }) ,
         bloc: viewModel,

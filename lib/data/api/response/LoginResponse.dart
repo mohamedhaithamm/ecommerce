@@ -1,4 +1,5 @@
-import 'package:e_commerce/data/api/response/user.dart';
+import 'package:e_commerce/data/api/response/userDto.dart';
+import 'package:e_commerce/domain/entity/auth_result_entity.dart';
 
 /// message : "success"
 /// user : {"name":"ahmed","email":"ahmed@route.com","role":"user"}
@@ -15,11 +16,11 @@ class LoginResponse {
   LoginResponse.fromJson(dynamic json) {
     message = json['message'];
     statusMsg = json['statusMsg'];
-    user = json['user'] != null ? User.fromJson(json['user']) : null;
+    user = json['user'] != null ? UserDto.fromJson(json['user']) : null;
     token = json['token'];
   }
   String? message;
-  User? user;
+  UserDto? user;
   String? token;
   String? statusMsg;
 
@@ -33,6 +34,11 @@ class LoginResponse {
     map['token'] = token;
     return map;
   }
-
+ AuthResultEntity toAuthResultEntity(){
+    return AuthResultEntity(
+      token: token,
+      userEntity: user?.toUserEntity()
+    );
+ }
 }
 

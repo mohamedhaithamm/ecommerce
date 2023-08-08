@@ -1,7 +1,6 @@
-// ignore_for_file: must_be_immutable
 
-import 'package:e_commerce/data/repository/auth_repository_impl.dart';
 import 'package:e_commerce/dialog_utils.dart';
+import 'package:e_commerce/domain/useCase/login_use_case.dart';
 import 'package:e_commerce/ui/login/cubit/login_state.dart';
 import 'package:e_commerce/ui/login/cubit/login_view_model.dart';
 import 'package:e_commerce/ui/login/login_navigator.dart';
@@ -25,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> implements LoginNavigator {
   // LoginScreenViewModel viewModel = LoginScreenViewModel(injectAuthRepository());
 
   var formKey = GlobalKey<FormState>();
-  LoginViewModel viewModel = LoginViewModel(injectAuthRepository());
+  LoginViewModel viewModel = LoginViewModel(injectLoginUseCase());
 // @override
 //   void initState() {
 //     // TODO: implement initState
@@ -38,9 +37,21 @@ class _LoginScreenState extends State<LoginScreen> implements LoginNavigator {
       // ChangeNotifierProvider<LoginScreenViewModel>(
       // create: (context)=> viewModel ,
       // child: 
-      BlocListener<LoginViewModel,RegisterViewStates>(
+      BlocListener<LoginViewModel,LoginViewStates>(
         listener: ((context,state){
-
+          if(state is LoginLoadingState){
+            DialogUtils.showProgressDialog(context, state.loadingMessage!);
+          }else if(state is LoginErrorState){
+            DialogUtils.hideDialog(context);
+            DialogUtils.showMessage(context, state.errorMessage!,
+                posActionTitle: 'ok'
+            );
+          }else if(state is LoginSuccessState){
+            DialogUtils.hideDialog(context);
+            DialogUtils.showMessage(context, 'Login Successfully',
+                posActionTitle: 'ok'
+            );
+          }
         }),
         bloc: viewModel ,
 
